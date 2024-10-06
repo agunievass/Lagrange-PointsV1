@@ -5,23 +5,25 @@ import numpy as np
 #Definicion de constantes
 G = 6.67 * 10**(-11) #Constante de gravitacion universal
 M_sol = 1.9891 * 10**30 #Masa del Sol, en kg
-M_tierra = 5.972 * 10**24 #Masa de la Tierra, en kg
-M_test = 0.00000000000000001 #Masa de la partícula de prueba
+M_tierra = 5.972 * 10**29 #Masa de la Tierra, en kg
+M_test = 0.00000000000001 #Masa de la partícula de prueba
 
 #Datos a tener a mano
 #Radio del Sol = 694,340km
 #Radio de la Tierra = 6371km
 
-radio_sol = 150 #Radio del sol en pixeles/bloquecitos de la rejilla
-radio_tierra = (6371*radio_sol)/694340
+resolucion = 1000 #Tamaño del canvas, de la simulacion
+intensity = 100000 #multiplicador de brillo del plot final (sketchy)
 
-resolucion = 3000 #Tamaño del canvas, de la simulacion
+
+radio_sol = resolucion/430 #Radio del sol en pixeles/bloquecitos de la rejilla
+radio_tierra = (6371*radio_sol)/694340
 
 x = 0 #Posicion en x inicial
 y = 0 #Posicion en y inicial
 
-pos_sol = (resolucion/2, resolucion/2)
-pos_tierra = (pos_sol[0] + 0, pos_sol[1] + 5*radio_sol) #Posicion de la tierra, las distancias sumadas son radios solares.
+pos_sol = (resolucion/2, (resolucion/2) * (1/3)) #El *(1/3) desplaza el centro del sol a la izquierda
+pos_tierra = (pos_sol[0] + 0, pos_sol[1] + 215*radio_sol) #Posicion de la tierra, las distancias sumadas son radios solares.
 print("La posicion de la tierra es:", pos_tierra)
 canvas = np.zeros((resolucion,resolucion)) #Canvas o cuadro donde voy a graficar los puntos del mapa
 
@@ -58,7 +60,8 @@ def distancia_al_sol(x,y): #Devuelve la distancia del punto (x,y) al centro del 
 
 
 def heatmap2d(arr: np.ndarray):
-    plt.imshow(arr, cmap='viridis')
+    #plt.imshow(arr, cmap='viridis', vmin=-15, vmax=15)
+    plt.imshow(arr, cmap='viridis', vmin= np.amin(canvas), vmax= np.amax(canvas)/intensity)
     plt.colorbar()
     plt.show()
 
@@ -72,12 +75,12 @@ for i in range(0,resolucion*resolucion):
     else:
         x += 1
     #print("X value is:", x, "Y value is:", y)
-    #valor_1 =  calcular_gravedad_solar(x,y)
+    valor_1 =  calcular_gravedad_solar(x,y)
     valor_2 = calcular_gravedad_terrestre(x,y)
     
 
-    #print("Fuerza is:", valor)
-    canvas[x,y] =  valor_2
+    #print("Fuerza is:", valor_2)
+    canvas[x,y] = valor_1 + valor_2 
 
 
 heatmap2d(canvas)
